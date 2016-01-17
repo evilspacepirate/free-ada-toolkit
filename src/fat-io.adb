@@ -84,24 +84,6 @@ package body fat.io is
            exec_args : unistd.string_array (1 .. arguments'length + 2);
            result    : int;
         begin
-           unistd.close(output.parent_to_child(1));
-           unistd.close(output.child_to_parent(0));
-
-           -- Connect child stdin to 'parent_to_child' pipe
-           if output.parent_to_child(0) /= unistd.stdin then
-              if unistd.dup2(output.parent_to_child(0), unistd.stdin) = -1 then
-                 raise dup2_error;
-              end if;
-              unistd.close(output.parent_to_child(0));
-           end if;
-
-           -- Connect child stdout to 'child_to_parent' pipe
-           if output.child_to_parent(1) /= unistd.stdout then
-              if unistd.dup2(output.child_to_parent(1), unistd.stdout) = -1 then
-                 raise dup2_error;
-              end if;
-              unistd.close(output.child_to_parent(1));
-           end if;
 
            exec_args(exec_args'first) := target_executable;
            exec_args(exec_args'last)  := null_ptr;

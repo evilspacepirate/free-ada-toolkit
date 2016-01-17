@@ -27,14 +27,7 @@ package fat.io is
 
    type file_descriptor is new int;
    type pipe is array (0 .. 1) of int;
-
-   type coprocess is record
-      to_child        : file_descriptor;
-      from_child      : file_descriptor;
-      child_pid       : int;
-      parent_to_child : pipe;
-      child_to_parent : pipe;
-   end record;
+   type coprocess is tagged private;
 
    pipe_error  : exception;
    dup2_error  : exception;
@@ -54,11 +47,11 @@ package fat.io is
    procedure put_hex (input     : in byte_array;
                       seperator : in string := " ");
 
-   function  read_bytes (source            : coprocess;
-                         max_bytes_to_read : integer) return byte_array;
+   function  read_bytes (source            : in coprocess;
+                         max_bytes_to_read : in integer) return byte_array;
 
-   function  read_string (source            : coprocess;
-                          max_bytes_to_read : integer) return string;
+   function  read_string (source            : in coprocess;
+                          max_bytes_to_read : in integer) return string;
 
    procedure write (destination   : in  coprocess;
                     data          : in  byte_array;
@@ -66,4 +59,14 @@ package fat.io is
    procedure write (destination   : in  coprocess;
                     data          : in  string;
                     result        : out long);
+   private
+
+   type coprocess is tagged record
+      to_child        : file_descriptor;
+      from_child      : file_descriptor;
+      child_pid       : int;
+      parent_to_child : pipe;
+      child_to_parent : pipe;
+   end record;
+
 end fat.io;

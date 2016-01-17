@@ -16,14 +16,31 @@
 --  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE
 --  USE OR PERFORMANCE OF THIS SOFTWARE.
 --
+with ada.text_io;          use ada.text_io;
 with interfaces.c.strings; use interfaces.c.strings;
+with fat.types;            use fat.types;
+with fat.io;               use fat.io;
 
-package fat.types is
+procedure io_coprocess_example is
+   echo      : coprocess;
+   arguments : string_array(0 .. 0) := (0 => new_string("Hello World!"));
 
-   type byte is mod 2 ** 8;
-   type word is mod 2 ** 16;
+begin
 
-   type byte_array is array(natural range <>) of byte;
-   type string_array is array(natural range <>) of chars_ptr;
+   echo := create_coprocess(new_string("/bin/echo"), arguments);
 
-end fat.types;
+   loop
+     declare
+        coprocess_output : string := echo.read_string(1024);
+     begin
+        if coprocess_output'length > 0 then
+           put(coprocess_output);
+        else
+           exit;
+        end if;
+     end;
+   end loop;
+
+   echo.kill;
+
+end io_coprocess_example;
